@@ -10,8 +10,7 @@ export const createMaintenanceValidation = [
   body('description').optional().trim(),
   body('date').optional().isISO8601().withMessage('Invalid date format'),
   body('cost')
-    .isNumeric().withMessage('Cost must be a number')
-    .isInt({ min: 0 }).withMessage('Cost cannot be negative'),
+  .isFloat({ min: 0 }).withMessage('Cost must be a positive number'),
 ];
 
 export const updateMaintenanceValidation = [
@@ -23,10 +22,7 @@ export const updateMaintenanceValidation = [
   body('description').optional().trim(),
   body('date').optional().isISO8601().withMessage('Invalid date format'),
   body('cost')
-    .optional()
-    .isNumeric().withMessage('Cost must be a number')
-    .isInt({ min: 0 }).withMessage('Cost cannot be negative'),
-  // vehicleId is not allowed to change
+  .isFloat({ min: 0 }).withMessage('Cost must be a positive number'),
 ];
 
 export const maintenanceIdValidation = [
