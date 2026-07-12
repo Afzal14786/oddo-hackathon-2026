@@ -1,6 +1,10 @@
-# Frontend – Oddo Hackathon 2026
+# TransitOps – Frontend
 
-This is the React frontend for the Hackathon project, built with **Vite** for blazing fast development and production builds. It follows a **modular, feature‑ready** structure that keeps code organised and scalable.
+**Smart Transport Operations Platform** – React frontend built with Vite.
+
+> This is the frontend for the **TransitOps** hackathon project. It provides a responsive dashboard, CRUD interfaces for vehicles/drivers/trips, maintenance workflow, fuel/expense logging, and analytics reports.
+
+---
 
 ## Tech Stack
 
@@ -8,9 +12,10 @@ This is the React frontend for the Hackathon project, built with **Vite** for bl
 - **Build Tool**: Vite
 - **Routing**: React Router v6
 - **HTTP Client**: Axios
-- **Styling**: CSS (or any CSS‑in‑JS / Tailwind – your choice)
-- **State Management**: React Context (or Redux if added later)
-- **Environment**: dotenv via Vite (`VITE_` prefix)
+- **State Management**: React Context (Auth, Theme)
+- **Styling**: CSS / Tailwind (optional)
+- **Charts**: Chart.js or Recharts (for reports)
+- **Environment**: dotenv (VITE_ prefix)
 
 ---
 
@@ -19,119 +24,131 @@ This is the React frontend for the Hackathon project, built with **Vite** for bl
 ```
 frontend/
 ├── node_modules/
-├── public/                # Static assets (favicon, robots.txt, etc.)
+├── public/                # static assets
 ├── src/
-│   ├── api/               # Axios client + API endpoint functions
-│   │   ├── client.js      # Axios instance with interceptors
-│   │   ├── authApi.js     # Login, register, logout
-│   │   └── sampleApi.js   # Example feature API
-│   ├── assets/            # Images, fonts, global styles
-│   │   ├── images/
-│   │   └── fonts/
-│   ├── components/        # Reusable presentational components
+│   ├── api/               # Axios client and API endpoints
+│   │   ├── client.js
+│   │   ├── authApi.js
+│   │   ├── vehiclesApi.js
+│   │   ├── driversApi.js
+│   │   ├── tripsApi.js
+│   │   ├── maintenanceApi.js
+│   │   ├── fuelApi.js
+│   │   └── reportsApi.js
+│   ├── assets/            # images, fonts
+│   ├── components/        # Reusable UI components
 │   │   ├── Button/
 │   │   ├── Card/
 │   │   ├── Navbar/
-│   │   └── Layout/
-│   ├── context/           # React Context providers (global state)
+│   │   ├── Sidebar/
+│   │   ├── Layout/
+│   │   ├── DataTable/
+│   │   ├── StatusBadge/
+│   │   └── Charts/
+│   ├── context/           # React Context providers
 │   │   ├── AuthContext.jsx
 │   │   └── ThemeContext.jsx
-│   ├── hooks/             # Custom React hooks
+│   ├── hooks/             # Custom hooks
 │   │   ├── useAuth.js
-│   │   └── useLocalStorage.js
-│   ├── pages/             # Page‑level components (each represents a route)
-│   │   ├── Home.jsx
+│   │   ├── useLocalStorage.js
+│   │   └── useFetch.js
+│   ├── pages/             # Page-level components
+│   │   ├── Dashboard.jsx          # KPIs, filters, charts
+│   │   ├── Vehicles/              # Vehicle list, create, edit
+│   │   │   ├── VehicleList.jsx
+│   │   │   ├── VehicleForm.jsx
+│   │   │   └── VehicleDetails.jsx
+│   │   ├── Drivers/               # Driver list, create, edit
+│   │   │   ├── DriverList.jsx
+│   │   │   └── DriverForm.jsx
+│   │   ├── Trips/                 # Trip creation, dispatch, status
+│   │   │   ├── TripList.jsx
+│   │   │   ├── TripForm.jsx
+│   │   │   └── TripDetails.jsx
+│   │   ├── Maintenance/           # Maintenance logs
+│   │   │   ├── MaintenanceList.jsx
+│   │   │   └── MaintenanceForm.jsx
+│   │   ├── FuelExpenses/          # Fuel and expense logging
+│   │   │   ├── FuelLogList.jsx
+│   │   │   └── FuelLogForm.jsx
+│   │   ├── Reports/               # Analytics and exports
+│   │   │   ├── ReportsDashboard.jsx
+│   │   │   └── ExportButton.jsx
 │   │   ├── Login.jsx
-│   │   └── Dashboard.jsx
-│   ├── utils/             # Helper functions (validators, formatters)
+│   │   └── Register.jsx
+│   ├── utils/             # Helpers
 │   │   ├── validators.js
 │   │   └── formatDate.js
 │   ├── App.css
-│   ├── App.jsx            # Main component with routing
-│   ├── index.css          # Global styles
-│   ├── main.jsx           # Entry point
-│   ├── .env               # Environment variables (ignored)
-│   └── .env.example       # Example env (committed)
+│   ├── App.jsx            # Routes and main layout
+│   ├── index.css
+│   ├── main.jsx
+│   ├── .env
+│   └── .env.example
 ├── .gitignore
-├── .env.example           # (also at root if needed)
+├── .env.example           # (duplicate if needed)
 ├── index.html
 ├── package.json
 ├── package-lock.json
 └── vite.config.js
 ```
 
-### Key Directories Explained
+## Pages & Features
 
-| Directory | Purpose |
-|-----------|---------|
-| **`src/api/`** | Centralises all API calls. `client.js` sets up Axios with baseURL and interceptors; feature‑specific files (e.g., `authApi.js`) call the client. |
-| **`src/assets/`** | Global static files like images, fonts, and any raw CSS/SCSS files shared across the app. |
-| **`src/components/`** | Reusable UI building blocks (buttons, modals, cards, layouts). Each component lives in its own folder with its styles and tests. |
-| **`src/context/`** | React Context providers for global state (authentication, theme, etc.). |
-| **`src/hooks/`** | Custom hooks that encapsulate stateful logic (e.g., `useAuth`, `useLocalStorage`). |
-| **`src/pages/`** | Top‑level components that map to routes. They combine components, hooks, and API calls to render full pages. |
-| **`src/utils/`** | Pure functions – validation, date formatting, string manipulation, etc. – that are not tied to React. |
+| Page | Description |
+|------|-------------|
+| **Login / Register** | Authentication with role-based access (Fleet Manager, Driver, Safety Officer, Financial Analyst). |
+| **Dashboard** | Displays KPIs: Active Vehicles, Available Vehicles, In Maintenance, Active Trips, Pending Trips, Drivers On Duty, Fleet Utilization (%). Filter by vehicle type/status/region. |
+| **Vehicles** | Full CRUD; list, add, edit, retire vehicles. Status badges (Available, On Trip, In Shop, Retired). |
+| **Drivers** | Full CRUD; manage driver profiles, license validity, safety score, status. |
+| **Trips** | Create trips with source, destination, vehicle/driver selection (enforces business rules), cargo weight validation. Lifecycle: Draft → Dispatched → Completed → Cancelled. Auto‑updates vehicle/driver statuses. |
+| **Maintenance** | Log maintenance records; vehicle status automatically becomes In Shop. Close maintenance to restore availability. |
+| **Fuel & Expenses** | Record fuel logs (liters, cost, date) and other expenses (tolls, repairs). View total operational cost per vehicle. |
+| **Reports & Analytics** | Charts for Fuel Efficiency, Fleet Utilization, Operational Cost, Vehicle ROI. CSV export (PDF optional). |
 
 ---
 
-## Setup Instructions
-
-### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
-
-### Installation
+## Setup
 
 ```bash
-# Clone the repo and navigate to frontend
 cd frontend
-
-# Install dependencies
 npm install
-```
-
-### Environment Variables
-
-Create a `.env` file from the example:
-
-```bash
-cp .env.example .env
-```
-
-**`.env.example`** (commit this file):
-
-```env
-# Backend API URL (used by Axios)
-VITE_API_URL=http://localhost:5000/api
-
-# Optional – app title, feature flags, etc.
-# VITE_APP_TITLE=Oddo Hackathon
-```
-
-### Running the Development Server
-
-```bash
+cp .env.example .env   # fill in API URL
 npm run dev
-```
+```  
 
-The app will be available at `http://localhost:5173` (or the next available port).  
-The development server supports hot module reload (HMR) for instant updates.
+### Environment Variables (`.env.example`)
+```text
+VITE_API_URL=http://localhost:5000/api
+```  
+---  
 
-### Building for Production
+### Vite Proxy (to avoid CORS)  
 
-```bash
-npm run build
-```
+`vite.config.js` includes a proxy for `/api` to the backend:  
 
-The build output is placed in `dist/` – ready to be served by any static host.
+```javascript
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+});
+```  
+> Now we can call `axios.get('/api/vehicles')` and it will be forwarded to the `backend`.   
+
+---  
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Starts the dev server with hot reload. |
-| `npm run build` | Creates a production build in `dist/`. |
-| `npm run preview` | Locally previews the production build. |
-| `npm run lint` | Runs ESLint (if configured). |
-
----
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build |
