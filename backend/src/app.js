@@ -20,7 +20,7 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5000',
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true, // allow cookies to be sent
 }));
 app.use(compression());
