@@ -1,0 +1,38 @@
+# Node modules (both backend and frontend)
+**/node_modules/
+
+# Environment variables (ignore actual env files, but keep .env.example)
+**/.env
+**/.env.local
+**/.env.production
+**/.env.development
+**/.env.*.local
+
+# Build / distribution outputs
+backend/dist/
+backend/build/
+frontend/dist/
+frontend/build/
+
+# Logs
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Vite cache (frontend)
+frontend/.vite/
+frontend/.vite-temp/
+
+# Coverage (testing)
+**/coverage/
