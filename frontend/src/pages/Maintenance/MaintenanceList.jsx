@@ -1,30 +1,17 @@
-import React, { useState, useEffect } from "react";
-import {
-  Plus,
-  Search,
-  Edit2,
-  Trash2,
-  RefreshCw,
-  X,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
-import { maintenanceApi, vehiclesApi } from "../../api";
-import StatusBadge from "../../components/StatusBadge";
-import ConfirmDialog from "../../components/ConfirmDialog";
-import MaintenanceForm from "./MaintenanceForm";
+// src/pages/Maintenance/MaintenanceList.jsx
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Edit2, Trash2, RefreshCw, X, CheckCircle } from 'lucide-react';
+import { maintenanceApi, vehiclesApi } from '../../api';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import MaintenanceForm from './MaintenanceForm';
 
 const MaintenanceList = () => {
   const [logs, setLogs] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState({
-    vehicleId: "",
-    closed: "",
-    type: "",
-  });
+  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({ vehicleId: '', closed: '', type: '' });
   const [showForm, setShowForm] = useState(false);
   const [editingLog, setEditingLog] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
@@ -36,14 +23,14 @@ const MaintenanceList = () => {
     try {
       const params = {};
       if (filters.vehicleId) params.vehicleId = filters.vehicleId;
-      if (filters.closed !== "") params.closed = filters.closed === "true";
+      if (filters.closed !== '') params.closed = filters.closed === 'true';
       if (filters.type) params.type = filters.type;
       if (search) params.search = search;
 
       const res = await maintenanceApi.getMaintenance(params);
       setLogs(res.data.data || []);
     } catch (err) {
-      setError(err.message || "Failed to fetch maintenance logs");
+      setError(err.message || 'Failed to fetch maintenance logs');
       console.error(err);
     } finally {
       setLoading(false);
@@ -55,7 +42,7 @@ const MaintenanceList = () => {
       const res = await vehiclesApi.getVehicles();
       setVehicles(res.data.data || []);
     } catch (err) {
-      console.error("Failed to fetch vehicles:", err);
+      console.error('Failed to fetch vehicles:', err);
     }
   };
 
@@ -81,7 +68,7 @@ const MaintenanceList = () => {
       fetchLogs();
       setDeletingId(null);
     } catch (err) {
-      console.error("Delete failed:", err);
+      console.error('Delete failed:', err);
     }
   };
 
@@ -92,7 +79,7 @@ const MaintenanceList = () => {
       fetchLogs();
       setClosingId(null);
     } catch (err) {
-      alert(err.message || "Failed to close maintenance record");
+      alert(err.message || 'Failed to close maintenance record');
     }
   };
 
@@ -101,12 +88,11 @@ const MaintenanceList = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ vehicleId: "", closed: "", type: "" });
-    setSearch("");
+    setFilters({ vehicleId: '', closed: '', type: '' });
+    setSearch('');
   };
 
-  const hasActiveFilters =
-    search || filters.vehicleId || filters.closed !== "" || filters.type;
+  const hasActiveFilters = search || filters.vehicleId || filters.closed !== '' || filters.type;
 
   return (
     <div className="max-w-full">
@@ -114,9 +100,7 @@ const MaintenanceList = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Maintenance</h1>
-          <p className="text-sm text-gray-500">
-            Manage vehicle maintenance logs
-          </p>
+          <p className="text-sm text-gray-500">Manage vehicle maintenance logs</p>
         </div>
         <button
           onClick={() => {
@@ -133,9 +117,7 @@ const MaintenanceList = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
         <div className="flex flex-col md:flex-row md:items-end gap-3">
           <div className="flex-1 min-w-[180px]">
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Search
-            </label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Search</label>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -143,7 +125,7 @@ const MaintenanceList = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by description..."
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <button
                 onClick={handleSearch}
@@ -156,14 +138,10 @@ const MaintenanceList = () => {
 
           <div className="flex flex-wrap items-end gap-3 flex-1">
             <div className="flex-1 min-w-[130px]">
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Vehicle
-              </label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Vehicle</label>
               <select
                 value={filters.vehicleId}
-                onChange={(e) =>
-                  setFilters({ ...filters, vehicleId: e.target.value })
-                }
+                onChange={(e) => setFilters({ ...filters, vehicleId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
               >
                 <option value="">All Vehicles</option>
@@ -176,14 +154,10 @@ const MaintenanceList = () => {
             </div>
 
             <div className="flex-1 min-w-[120px]">
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Status
-              </label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
               <select
                 value={filters.closed}
-                onChange={(e) =>
-                  setFilters({ ...filters, closed: e.target.value })
-                }
+                onChange={(e) => setFilters({ ...filters, closed: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
               >
                 <option value="">All</option>
@@ -193,14 +167,10 @@ const MaintenanceList = () => {
             </div>
 
             <div className="flex-1 min-w-[140px]">
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Type
-              </label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Type</label>
               <select
                 value={filters.type}
-                onChange={(e) =>
-                  setFilters({ ...filters, type: e.target.value })
-                }
+                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
               >
                 <option value="">All Types</option>
@@ -234,51 +204,35 @@ const MaintenanceList = () => {
         ) : error ? (
           <div className="text-center py-12 text-red-500">{error}</div>
         ) : logs.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            No maintenance records found
-          </div>
+          <div className="text-center py-12 text-gray-500">No maintenance records found</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px]">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Vehicle
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Type
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Description
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Cost
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Date
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                    Actions
-                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehicle</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cost</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {logs.map((log) => (
                   <tr key={log._id} className="hover:bg-gray-50 transition">
                     <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                      {log.vehicleId?.registrationNumber || "N/A"}
+                      {log.vehicleId?.registrationNumber || 'N/A'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600 capitalize whitespace-nowrap">
-                      {log.type.replace("_", " ")}
+                      {log.type.replace('_', ' ')}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
-                      {log.description || "-"}
+                      {log.description || '-'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                      ₹{log.cost.toLocaleString("en-IN")}
+                      ₹{log.cost.toLocaleString('en-IN')}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
                       {new Date(log.date).toLocaleDateString()}
@@ -348,7 +302,7 @@ const MaintenanceList = () => {
         }}
         onSubmit={editingLog ? handleUpdate : handleCreate}
         initialData={editingLog}
-        title={editingLog ? "Edit Maintenance Log" : "Add Maintenance Log"}
+        title={editingLog ? 'Edit Maintenance Log' : 'Add Maintenance Log'}
         vehicles={vehicles}
       />
 

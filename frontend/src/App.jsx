@@ -1,22 +1,24 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import VehicleList from './pages/Vehicles/VehicleList';
 import DriverList from './pages/Drivers/DriverList';
-import TripForm from './pages/Trips/TripForm';
-import Maintenance from './pages/Maintenance/Maintenance';
+import TripList from './pages/Trips/TripList';
+import MaintenanceList from './pages/Maintenance/MaintenanceList';
 import FinanceLogs from './pages/Finance/FinanceLogs';
+import ReportsDashboard from './pages/Reports/ReportsDashboard';
 
-
-// A simple layout wrapper to keep the Sidebar on every dashboard page
+// Layout wrapper with Sidebar
 const AppLayout = ({ children }) => {
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="h-screen bg-slate-50 overflow-hidden">
       <Sidebar />
-      {/* Added pl-64 here to slide the content past the fixed 64-unit sidebar */}
-      <main className="flex-1 pl-64 overflow-y-auto p-8">
+      <main className="ml-64 h-full overflow-y-auto p-8">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>
@@ -25,25 +27,78 @@ const AppLayout = ({ children }) => {
   );
 };
 
-
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <Routes>
-          {/* Main Dashboard Routing */}
-          <Route path="/" element={<AppLayout><Dashboard /></AppLayout>} />
-          <Route path="/vehicles" element={<AppLayout><VehicleList /></AppLayout>} />
-          <Route path="/drivers" element={<AppLayout><DriverList /></AppLayout>} />
-          <Route path="/trips" element={<AppLayout><TripForm /></AppLayout>} />
-          <Route path="/maintenance" element={<AppLayout><Maintenance /></AppLayout>} />
-          <Route path="/finance" element={<AppLayout><FinanceLogs /></AppLayout>} />
-          
+          {/* Public auth routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Protected routes with sidebar */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AppLayout><Dashboard /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vehicles"
+            element={
+              <ProtectedRoute>
+                <AppLayout><VehicleList /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/drivers"
+            element={
+              <ProtectedRoute>
+                <AppLayout><DriverList /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trips"
+            element={
+              <ProtectedRoute>
+                <AppLayout><TripList /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/maintenance"
+            element={
+              <ProtectedRoute>
+                <AppLayout><MaintenanceList /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/finance"
+            element={
+              <ProtectedRoute>
+                <AppLayout><FinanceLogs /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <AppLayout><ReportsDashboard /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
           {/* Catch-all redirect to Dashboard */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
