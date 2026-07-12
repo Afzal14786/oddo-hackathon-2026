@@ -1,8 +1,14 @@
 # TransitOps – Frontend
 
-**Smart Transport Operations Platform** – React frontend built with Vite.
+Smart Transport Operations Platform – React frontend built with Vite.
 
-> This is the frontend for the **TransitOps** hackathon project. It provides a responsive dashboard, CRUD interfaces for vehicles/drivers/trips, maintenance workflow, fuel/expense logging, and analytics reports.
+This is the frontend for the TransitOps hackathon project. It provides a responsive dashboard, CRUD interfaces for vehicles/drivers/trips, maintenance workflow, fuel/expense logging, and analytics reports.
+
+---
+
+## Live Demo
+
+**Deployed URL:** [https://oddo-hackathon-2026-nvab.vercel.app/](https://oddo-hackathon-2026-nvab.vercel.app/)
 
 ---
 
@@ -12,86 +18,77 @@
 - **Build Tool**: Vite
 - **Routing**: React Router v6
 - **HTTP Client**: Axios
-- **State Management**: React Context (Auth, Theme)
-- **Styling**: CSS / Tailwind (optional)
-- **Charts**: Chart.js or Recharts (for reports)
+- **State Management**: React Context (Auth)
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
 - **Environment**: dotenv (VITE_ prefix)
 
 ---
 
 ## Folder Structure
 
-```
+```text
 frontend/
-├── node_modules/
-├── public/                # static assets
+├── public/
+│   ├── favicon.svg
+│   └── icons.svg
 ├── src/
-│   ├── api/               # Axios client and API endpoints
-│   │   ├── client.js
+│   ├── api/
 │   │   ├── authApi.js
-│   │   ├── vehiclesApi.js
+│   │   ├── client.js
 │   │   ├── driversApi.js
-│   │   ├── tripsApi.js
-│   │   ├── maintenanceApi.js
 │   │   ├── fuelApi.js
-│   │   └── reportsApi.js
-│   ├── assets/            # images, fonts
-│   ├── components/        # Reusable UI components
-│   │   ├── Button/
-│   │   ├── Card/
-│   │   ├── Navbar/
-│   │   ├── Sidebar/
-│   │   ├── Layout/
-│   │   ├── DataTable/
-│   │   ├── StatusBadge/
-│   │   └── Charts/
-│   ├── context/           # React Context providers
-│   │   ├── AuthContext.jsx
-│   │   └── ThemeContext.jsx
-│   ├── hooks/             # Custom hooks
-│   │   ├── useAuth.js
-│   │   ├── useLocalStorage.js
-│   │   └── useFetch.js
-│   ├── pages/             # Page-level components
-│   │   ├── Dashboard.jsx          # KPIs, filters, charts
-│   │   ├── Vehicles/              # Vehicle list, create, edit
-│   │   │   ├── VehicleList.jsx
-│   │   │   ├── VehicleForm.jsx
-│   │   │   └── VehicleDetails.jsx
-│   │   ├── Drivers/               # Driver list, create, edit
-│   │   │   ├── DriverList.jsx
-│   │   │   └── DriverForm.jsx
-│   │   ├── Trips/                 # Trip creation, dispatch, status
-│   │   │   ├── TripList.jsx
-│   │   │   ├── TripForm.jsx
-│   │   │   └── TripDetails.jsx
-│   │   ├── Maintenance/           # Maintenance logs
-│   │   │   ├── MaintenanceList.jsx
-│   │   │   └── MaintenanceForm.jsx
-│   │   ├── FuelExpenses/          # Fuel and expense logging
-│   │   │   ├── FuelLogList.jsx
+│   │   ├── index.js
+│   │   ├── maintenanceApi.js
+│   │   ├── reportsApi.js
+│   │   ├── tripsApi.js
+│   │   └── vehiclesApi.js
+│   ├── components/
+│   │   ├── ConfirmDialog.jsx
+│   │   ├── ProtectedRoute.jsx
+│   │   ├── Sidebar.jsx
+│   │   ├── Spinner.jsx
+│   │   └── StatusBadge.jsx
+│   ├── context/
+│   │   └── AuthContext.jsx
+│   ├── pages/
+│   │   ├── Drivers/
+│   │   │   ├── DriverForm.jsx
+│   │   │   └── DriverList.jsx
+│   │   ├── Finance/
+│   │   │   ├── ExpenseForm.jsx
+│   │   │   ├── FinanceLogs.jsx
 │   │   │   └── FuelLogForm.jsx
-│   │   ├── Reports/               # Analytics and exports
-│   │   │   ├── ReportsDashboard.jsx
-│   │   │   └── ExportButton.jsx
+│   │   ├── Maintenance/
+│   │   │   ├── MaintenanceForm.jsx
+│   │   │   └── MaintenanceList.jsx
+│   │   ├── Reports/
+│   │   │   └── ReportsDashboard.jsx
+│   │   ├── Trips/
+│   │   │   ├── CompleteTripModal.jsx
+│   │   │   ├── TripForm.jsx
+│   │   │   └── TripList.jsx
+│   │   ├── Vehicles/
+│   │   │   ├── VehicleForm.jsx
+│   │   │   └── VehicleList.jsx
+│   │   ├── Dashboard.jsx
 │   │   ├── Login.jsx
 │   │   └── Register.jsx
-│   ├── utils/             # Helpers
-│   │   ├── validators.js
-│   │   └── formatDate.js
 │   ├── App.css
-│   ├── App.jsx            # Routes and main layout
+│   ├── App.jsx
 │   ├── index.css
-│   ├── main.jsx
-│   ├── .env
-│   └── .env.example
+│   └── main.jsx
+├── .env.example
 ├── .gitignore
-├── .env.example           # (duplicate if needed)
 ├── index.html
 ├── package.json
 ├── package-lock.json
+├── postcss.config.js
+├── vercel.json
 └── vite.config.js
-```
+```  
+
+---
 
 ## Pages & Features
 
@@ -101,7 +98,7 @@ frontend/
 | **Dashboard** | Displays KPIs: Active Vehicles, Available Vehicles, In Maintenance, Active Trips, Pending Trips, Drivers On Duty, Fleet Utilization (%). Filter by vehicle type/status/region. |
 | **Vehicles** | Full CRUD; list, add, edit, retire vehicles. Status badges (Available, On Trip, In Shop, Retired). |
 | **Drivers** | Full CRUD; manage driver profiles, license validity, safety score, status. |
-| **Trips** | Create trips with source, destination, vehicle/driver selection (enforces business rules), cargo weight validation. Lifecycle: Draft → Dispatched → Completed → Cancelled. Auto‑updates vehicle/driver statuses. |
+| **Trips** | Create trips with source, destination, vehicle/driver selection (enforces business rules), cargo weight validation. Lifecycle: Draft -> Dispatched -> Completed -> Cancelled. Auto-updates vehicle/driver statuses. |
 | **Maintenance** | Log maintenance records; vehicle status automatically becomes In Shop. Close maintenance to restore availability. |
 | **Fuel & Expenses** | Record fuel logs (liters, cost, date) and other expenses (tolls, repairs). View total operational cost per vehicle. |
 | **Reports & Analytics** | Charts for Fuel Efficiency, Fleet Utilization, Operational Cost, Vehicle ROI. CSV export (PDF optional). |
@@ -113,42 +110,34 @@ frontend/
 ```bash
 cd frontend
 npm install
-cp .env.example .env   # fill in API URL
+cp .env.example .env
 npm run dev
 ```  
+---  
 
-### Environment Variables (`.env.example`)
+## Environment Variables  
+
+Create a `.env` file in the root of the frontend:  
+
 ```text
-VITE_API_URL=http://localhost:5000/api
+VITE_API_BASE_URL=http://localhost:5000/api/v1
 ```  
----  
+--- 
 
-### Vite Proxy (to avoid CORS)  
+## Available Scripts
 
-`vite.config.js` includes a proxy for `/api` to the backend:  
-
-```javascript
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
-});
-```  
-> Now we can call `axios.get('/api/vehicles')` and it will be forwarded to the `backend`.   
-
----  
-
-## Scripts
-
-| Command | Description |
+| **Command** | **Description** |
 |---------|-------------|
-| `npm run dev` | Start dev server |
+| `npm run dev` | Start development server |
 | `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
+
+---  
+
+## Deployment
+
+The frontend is deployed on Vercel. The production build is created using:
+
+```bash
+npm run build
+```  
+
