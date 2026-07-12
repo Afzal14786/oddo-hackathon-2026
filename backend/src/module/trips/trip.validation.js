@@ -4,14 +4,14 @@ export const createTripValidation = [
   body('source').notEmpty().withMessage('Source is required'),
   body('destination').notEmpty().withMessage('Destination is required'),
   body('cargoWeight')
-    .isNumeric().withMessage('Cargo weight must be a number')
-    .isInt({ min: 0 }).withMessage('Cargo weight cannot be negative'),
+    .isFloat({ min: 0 }).withMessage('Cargo weight must be a positive number'),
   body('plannedDistance')
-    .isNumeric().withMessage('Planned distance must be a number')
-    .isInt({ min: 0 }).withMessage('Planned distance cannot be negative'),
+    .isFloat({ min: 0 }).withMessage('Planned distance must be a positive number'),
   body('vehicleId').isMongoId().withMessage('Invalid vehicle ID'),
   body('driverId').isMongoId().withMessage('Invalid driver ID'),
-  body('revenue').optional().isNumeric().withMessage('Revenue must be a number'),
+  body('revenue')
+    .optional()
+    .isFloat({ min: 0 }).withMessage('Revenue must be a positive number'),
 ];
 
 export const updateTripValidation = [
@@ -20,15 +20,19 @@ export const updateTripValidation = [
   body('destination').optional().notEmpty().withMessage('Destination cannot be empty'),
   body('cargoWeight')
     .optional()
-    .isNumeric().withMessage('Cargo weight must be a number')
-    .isInt({ min: 0 }).withMessage('Cargo weight cannot be negative'),
+    .isFloat({ min: 0 }).withMessage('Cargo weight must be a positive number'),
   body('plannedDistance')
     .optional()
-    .isNumeric().withMessage('Planned distance must be a number')
-    .isInt({ min: 0 }).withMessage('Planned distance cannot be negative'),
-  body('vehicleId').optional().isMongoId().withMessage('Invalid vehicle ID'),
-  body('driverId').optional().isMongoId().withMessage('Invalid driver ID'),
-  body('revenue').optional().isNumeric().withMessage('Revenue must be a number'),
+    .isFloat({ min: 0 }).withMessage('Planned distance must be a positive number'),
+  body('vehicleId')
+    .optional()
+    .isMongoId().withMessage('Invalid vehicle ID'),
+  body('driverId')
+    .optional()
+    .isMongoId().withMessage('Invalid driver ID'),
+  body('revenue')
+    .optional()
+    .isFloat({ min: 0 }).withMessage('Revenue must be a positive number'),
 ];
 
 export const tripIdValidation = [
@@ -38,20 +42,35 @@ export const tripIdValidation = [
 export const completeTripValidation = [
   param('id').isMongoId().withMessage('Invalid trip ID'),
   body('actualDistance')
-    .isNumeric().withMessage('Actual distance must be a number')
-    .isInt({ min: 0 }).withMessage('Actual distance cannot be negative'),
+    .isFloat({ min: 0 }).withMessage('Actual distance must be a positive number'),
   body('fuelConsumed')
-    .isNumeric().withMessage('Fuel consumed must be a number')
-    .isInt({ min: 0 }).withMessage('Fuel consumed cannot be negative'),
-  body('revenue').optional().isNumeric().withMessage('Revenue must be a number'),
+    .isFloat({ min: 0 }).withMessage('Fuel consumed must be a positive number'),
+  body('revenue')
+    .optional()
+    .isFloat({ min: 0 }).withMessage('Revenue must be a positive number'),
 ];
 
 export const listTripsValidation = [
-  query('status').optional().isIn(['draft', 'dispatched', 'completed', 'cancelled']),
-  query('vehicleId').optional().isMongoId().withMessage('Invalid vehicle ID'),
-  query('driverId').optional().isMongoId().withMessage('Invalid driver ID'),
-  query('fromDate').optional().isISO8601().withMessage('Invalid from date'),
-  query('toDate').optional().isISO8601().withMessage('Invalid to date'),
-  query('limit').optional().isInt({ min: 1, max: 100 }),
-  query('skip').optional().isInt({ min: 0 }),
+  query('status')
+    .optional()
+    .isIn(['draft', 'dispatched', 'completed', 'cancelled'])
+    .withMessage('Invalid trip status'),
+  query('vehicleId')
+    .optional()
+    .isMongoId().withMessage('Invalid vehicle ID'),
+  query('driverId')
+    .optional()
+    .isMongoId().withMessage('Invalid driver ID'),
+  query('fromDate')
+    .optional()
+    .isISO8601().withMessage('Invalid from date'),
+  query('toDate')
+    .optional()
+    .isISO8601().withMessage('Invalid to date'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+  query('skip')
+    .optional()
+    .isInt({ min: 0 }).withMessage('Skip must be 0 or greater'),
 ];

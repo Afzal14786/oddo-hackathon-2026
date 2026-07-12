@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { Trip } from './trip.model.js';
 import { Vehicle } from '../vehicles/vehicle.model.js';
 import { Driver } from '../drivers/driver.model.js';
@@ -7,9 +6,9 @@ import { HTTP_STATUS } from '../../shared/constant/http-codes.js';
 import { updateVehicleStatus } from '../vehicles/vehicle.service.js';
 import { updateDriverStatus } from '../drivers/driver.service.js';
 
-
+// create trip
 export const createTrip = async (data) => {
-  // basic existence check for vehicle and driver (they must exist)
+
   const [vehicle, driver] = await Promise.all([
     Vehicle.findById(data.vehicleId),
     Driver.findById(data.driverId),
@@ -17,17 +16,10 @@ export const createTrip = async (data) => {
 
   if (!vehicle) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Vehicle not found');
   if (!driver) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Driver not found');
-
-  // Create trip
-  const trip = await Trip.create(data);
-  return trip;
+  return await Trip.create(data);
 };
 
-/**
- * get trips with filters.
- * { status, vehicleId, driverId, fromDate, toDate, search? }
- * { limit, skip, sort }
- */
+// get trip
 export const getTrips = async (filters = {}, options = {}) => {
   const query = {};
 
@@ -52,32 +44,23 @@ export const getTrips = async (filters = {}, options = {}) => {
     .limit(limit);
 };
 
-/**
- * get a single trip by ID.
- */
+// get trip by id
 export const getTripById = async (id) => {
   const trip = await Trip.findById(id)
     .populate('vehicleId')
     .populate('driverId');
-  if (!trip) {
-    throw new AppError(HTTP_STATUS.NOT_FOUND, 'Trip not found');
-  }
+  if (!trip) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Trip not found');
   return trip;
 };
 
-/**
- * update a draft trip (only allowed if status is draft).
- */
+// update trip
 export const updateTrip = async (id, data) => {
   const trip = await Trip.findById(id);
-  if (!trip) {
-    throw new AppError(HTTP_STATUS.NOT_FOUND, 'Trip not found');
-  }
+  if (!trip) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Trip not found');
   if (trip.status !== 'draft') {
     throw new AppError(HTTP_STATUS.BAD_REQUEST, 'Cannot update trip after dispatch');
   }
 
-  // if vehicle or driver is changed, we need to check existence (but no availability yet)
   if (data.vehicleId) {
     const vehicle = await Vehicle.findById(data.vehicleId);
     if (!vehicle) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Vehicle not found');
@@ -86,28 +69,20 @@ export const updateTrip = async (id, data) => {
     const driver = await Driver.findById(data.driverId);
     if (!driver) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Driver not found');
   }
-
-  const updated = await Trip.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true,
-  });
+  const updated = await Trip.findByIdAndUpdate(id, data, { new: true, runValidators: true });
   return updated;
 };
 
-/**
- * dispatch a trip – enforces ALL business rules.
- * tripId
- * Dispatched trip
- */
+// dispatch trip
 export const dispatchTrip = async (tripId) => {
-  // fetch trip
+
   const trip = await Trip.findById(tripId);
   if (!trip) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Trip not found');
   if (trip.status !== 'draft') {
     throw new AppError(HTTP_STATUS.BAD_REQUEST, `Cannot dispatch trip with status ${trip.status}`);
   }
 
-  // fetch vehicle and driver
+
   const vehicle = await Vehicle.findById(trip.vehicleId);
   const driver = await Driver.findById(trip.driverId);
   if (!vehicle) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Vehicle not found');
@@ -138,26 +113,18 @@ export const dispatchTrip = async (tripId) => {
   trip.dispatchedAt = new Date();
   await trip.save();
 
-  // update vehicle and driver status to on_trip
-  vehicle.status = 'on_trip';
-  await vehicle.save();
-
-  driver.status = 'on_trip';
-  await driver.save();
+  // use shared functions to update vehicle and driver statuses
+  await updateVehicleStatus(vehicle._id, 'on_trip');
+  await updateDriverStatus(driver._id, 'on_trip');
 
   await trip.populate('vehicleId driverId');
   return trip;
 };
 
-/**
- * complete a dispatched trip – updates odometer, fuel, statuses.
- * tripId
- * { actualDistance, fuelConsumed, revenue? }
- * Completed trip
- */
+// complete trip
 export const completeTrip = async (tripId, data) => {
   const { actualDistance, fuelConsumed, revenue } = data;
-
+  
   if (actualDistance == null || actualDistance < 0) {
     throw new AppError(HTTP_STATUS.BAD_REQUEST, 'Actual distance is required and must be positive');
   }
@@ -185,22 +152,17 @@ export const completeTrip = async (tripId, data) => {
 
   // update vehicle odometer and status
   vehicle.odometer += actualDistance;
-  vehicle.status = 'available';
-  await vehicle.save();
+  await vehicle.save(); // odometer update, then change status via shared function
+  await updateVehicleStatus(vehicle._id, 'available');
 
   // update driver status
-  driver.status = 'available';
-  await driver.save();
+  await updateDriverStatus(driver._id, 'available');
 
   await trip.populate('vehicleId driverId');
   return trip;
 };
 
-/**
- * cancel a trip (draft or dispatched).
- * tripId
- * Cancelled trip
- */
+// cancel trip
 export const cancelTrip = async (tripId) => {
   const trip = await Trip.findById(tripId);
   if (!trip) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Trip not found');
@@ -211,17 +173,15 @@ export const cancelTrip = async (tripId) => {
     throw new AppError(HTTP_STATUS.BAD_REQUEST, 'Trip is already cancelled');
   }
 
-  // If dispatched, restore vehicle and driver statuses
+
   if (trip.status === 'dispatched') {
     const vehicle = await Vehicle.findById(trip.vehicleId);
     const driver = await Driver.findById(trip.driverId);
     if (vehicle && vehicle.status === 'on_trip') {
-      vehicle.status = 'available';
-      await vehicle.save();
+      await updateVehicleStatus(vehicle._id, 'available');
     }
     if (driver && driver.status === 'on_trip') {
-      driver.status = 'available';
-      await driver.save();
+      await updateDriverStatus(driver._id, 'available');
     }
   }
 
@@ -233,14 +193,10 @@ export const cancelTrip = async (tripId) => {
   return trip;
 };
 
-/**
- * Delete a trip (only if draft).
- */
+// delete trip
 export const deleteTrip = async (tripId) => {
   const trip = await Trip.findById(tripId);
-  if (!trip) {
-    throw new AppError(HTTP_STATUS.NOT_FOUND, 'Trip not found');
-  }
+  if (!trip) throw new AppError(HTTP_STATUS.NOT_FOUND, 'Trip not found');
   if (trip.status !== 'draft') {
     throw new AppError(HTTP_STATUS.BAD_REQUEST, 'Only draft trips can be deleted');
   }
